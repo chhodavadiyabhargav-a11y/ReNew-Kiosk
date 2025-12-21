@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReNew Kiosk</title>
+    <!-- Using Tailwind CSS for layout (via CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Using FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Custom Styles merging style.css */
+        
+        body {
+            /* Background setup using the requested filename, with a fallback gradient */
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('Background.gif');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-color: #1a202c; /* Fallback dark color */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* Logo Styling */
+        .logo-container {
+            margin-top: 2rem;
+            margin-bottom: 3rem;
+            text-align: center;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .logo-img {
+            max-width: 200px;
+            height: auto;
+            /* Drop shadow to make logo pop if transparent */
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+        }
+
+        /* Card Container */
+        .cards-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+            width: 100%;
+            max-width: 1200px;
+            padding: 0 1rem;
+        }
+
+        /* Card Styles */
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            width: 300px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-decoration: none;
+            color: inherit;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        /* Smooth Hover Effect */
+        .card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+            background: #ffffff;
+        }
+
+        .card:hover .icon-wrapper {
+            background-color: #10b981; /* Emerald-500 */
+            color: white;
+            transform: rotateY(180deg);
+        }
+
+        /* Icon Styling inside Card */
+        .icon-wrapper {
+            width: 80px;
+            height: 80px;
+            background-color: #ecfdf5; /* Emerald-50 */
+            color: #059669; /* Emerald-600 */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem auto;
+            font-size: 2rem;
+            transition: all 0.5s ease;
+        }
+
+        .card h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .card p {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        /* Loading Overlay */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            z-index: 9999;
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        #loading-overlay img {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 1rem;
+        }
+
+        .loading-text {
+            color: white;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        /* CSS Loading Spinner Fallback (in case GIF is missing) */
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #10b981;
+            width: 60px;
+            height: 60px;
+            -webkit-animation: spin 1s linear infinite; /* Safari */
+            animation: spin 1s linear infinite;
+            display: none; /* Hidden if GIF loads */
+        }
+
+        /* Show spinner if img fails (handled via JS or just CSS toggle) */
+        .img-error-fallback .spinner {
+            display: block;
+        }
+        .img-error-fallback img {
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Logo Section -->
+    <div class="logo-container">
+        <!-- Using onerror to handle missing logo elegantly -->
+        <img src="logo.png" alt="Company Logo" class="logo-img" onerror="this.style.display='none'; document.getElementById('text-logo').style.display='block'">
+        <h1 id="text-logo" style="display:none; color: white; font-size: 2.5rem; font-weight: bold;">ReNew KIOSK</h1>
+    </div>
+
+    <!-- Cards Section -->
+    <div class="cards-container">
+        
+        <!-- Card 1: SAP SuccessFactors -->
+        <div class="card" onclick="handleCardClick('https://hcm44.sapsf.com/sf/home?bplte_company=renewpower')">
+            <div class="icon-wrapper">
+                <i class="fa-solid fa-users-gear"></i>
+            </div>
+            <h3>SAP SuccessFactors</h3>
+            <p>Access your HR and performance management dashboard.</p>
+        </div>
+
+        <!-- Card 2: Payroll Portal -->
+        <div class="card" onclick="handleCardClick('https://smartpay.buzzily.com/Renew')">
+            <div class="icon-wrapper">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+            </div>
+            <h3>Payroll Portal</h3>
+            <p>View your payslips and manage tax declarations.</p>
+        </div>
+
+        <!-- Card 3: Password Reset -->
+        <div class="card" onclick="handleCardClick('https://passwordreset.renew.com/authorization.do')">
+            <div class="icon-wrapper">
+                <i class="fa-solid fa-lock-open"></i>
+            </div>
+            <h3>Password Reset</h3>
+            <p>Unlock your account or reset your password securely.</p>
+        </div>
+
+    </div>
+
+    <!-- Footer Instruction -->
+    <div style="margin-top: auto; padding: 20px; color: rgba(255,255,255,0.5); font-size: 0.8rem;">
+        Press <span style="border: 1px solid rgba(255,255,255,0.3); padding: 2px 6px; border-radius: 4px;">Alt</span> + <span style="border: 1px solid rgba(255,255,255,0.3); padding: 2px 6px; border-radius: 4px;">←</span> to return Home
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay">
+        <!-- Primary GIF -->
+        <img src="Loading.gif" alt="Loading..." onerror="this.parentElement.classList.add('img-error-fallback')">
+        <!-- Fallback CSS Spinner -->
+        <div class="spinner"></div>
+        <div class="loading-text">Redirecting...</div>
+    </div>
+
+    <script>
+        // --- script.js functionality ---
+
+        /**
+         * Handles card clicks.
+         * Shows the overlay first, then waits briefly (for visual confirmation) 
+         * before redirecting.
+         */
+        function handleCardClick(url) {
+            const overlay = document.getElementById('loading-overlay');
+            
+            // Show the loading overlay
+            overlay.style.display = 'flex';
+
+            // Use a small timeout to allow the GIF to render/start playing before navigation logic kicks in
+            // and to ensure the user sees the "loading" state.
+            setTimeout(() => {
+                window.location.href = url;
+            }, 500); // 500ms delay for smooth UX
+        }
+
+        /**
+         * Keyboard Shortcut Listener
+         * Detects Alt + Left Arrow to go to index.html
+         */
+        document.addEventListener('keydown', function(event) {
+            // Check for Alt key + Left Arrow key
+            if (event.altKey && event.key === 'ArrowLeft') {
+                event.preventDefault(); // Prevent default browser behavior if needed
+                
+                // Redirect to index.html
+                // If we are already on index.html, this effectively reloads, 
+                // essentially acting as a "Home" button.
+                console.log("Navigating to Home...");
+                window.location.href = 'index.html';
+            }
+        });
+
+    </script>
+</body>
+</html>
